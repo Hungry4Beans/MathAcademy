@@ -1,0 +1,540 @@
+
+bash
+
+cat > /mnt/user-data/outputs/MathAcademy.html << 'HTMLEOF'
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MathAcademy</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;--bg2:#12121a;--bg3:#1a1a26;--bg4:#22223a;
+  --accent:#6c63ff;--accent2:#ff6584;--accent3:#43e8b0;--accent4:#ffd166;
+  --text:#f0eeff;--text2:#a09ec0;--text3:#6a68a0;
+  --border:#2a2a40;--border2:#3a3a58;
+  --success:#43e8b0;--warn:#ffd166;--danger:#ff6584;
+  --card-radius:16px;--btn-radius:10px;
+  --font-display:'DM Serif Display',serif;
+  --font-body:'Plus Jakarta Sans',sans-serif;
+  --font-mono:'DM Mono',monospace;
+}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden}
+#app{display:flex;flex-direction:column;min-height:100vh}
+
+/* NAV */
+nav{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.nav-logo{font-family:var(--font-display);font-size:22px;color:var(--accent);letter-spacing:-0.5px}
+.nav-logo span{color:var(--accent3)}
+.nav-tabs{display:flex;gap:4px}
+.nav-tab{background:none;border:none;color:var(--text2);padding:6px 14px;border-radius:8px;cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:500;transition:all 0.2s}
+.nav-tab:hover{background:var(--bg3);color:var(--text)}
+.nav-tab.active{background:var(--bg3);color:var(--accent);border:1px solid var(--border2)}
+.nav-user{display:flex;align-items:center;gap:10px}
+.xp-badge{background:var(--bg3);border:1px solid var(--border2);border-radius:20px;padding:4px 12px;font-size:12px;color:var(--accent4);font-weight:600;font-family:var(--font-mono)}
+
+/* MAIN */
+main{flex:1;padding:28px 24px;max-width:1100px;margin:0 auto;width:100%}
+
+/* HOME */
+.hero{text-align:center;padding:48px 0 36px}
+.hero h1{font-family:var(--font-display);font-size:52px;line-height:1.1;margin-bottom:12px}
+.hero h1 em{color:var(--accent);font-style:italic}
+.hero p{color:var(--text2);font-size:17px;margin-bottom:32px}
+.subject-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:36px}
+.subject-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);padding:22px 18px;cursor:pointer;transition:all 0.2s;text-align:left;position:relative;overflow:hidden}
+.subject-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:3px 3px 0 0}
+.subject-card.alg::before{background:var(--accent)}
+.subject-card.geo::before{background:var(--accent2)}
+.subject-card.trig::before{background:var(--accent3)}
+.subject-card.precalc::before{background:var(--accent4)}
+.subject-card.calc::before{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.subject-card:hover{border-color:var(--border2);transform:translateY(-2px)}
+.subject-card:hover.alg{border-color:var(--accent)}
+.subject-card:hover.geo{border-color:var(--accent2)}
+.subject-card:hover.trig{border-color:var(--accent3)}
+.subject-card:hover.precalc{border-color:var(--accent4)}
+.subject-card:hover.calc{border-color:var(--accent)}
+.subject-icon{font-size:28px;margin-bottom:10px}
+.subject-title{font-weight:600;font-size:15px;margin-bottom:4px}
+.subject-desc{color:var(--text2);font-size:12px;line-height:1.5;margin-bottom:12px}
+.subject-progress{height:4px;background:var(--bg3);border-radius:4px;overflow:hidden;margin-bottom:6px}
+.subject-progress-bar{height:100%;border-radius:4px;transition:width 0.5s}
+.subject-card.alg .subject-progress-bar{background:var(--accent)}
+.subject-card.geo .subject-progress-bar{background:var(--accent2)}
+.subject-card.trig .subject-progress-bar{background:var(--accent3)}
+.subject-card.precalc .subject-progress-bar{background:var(--accent4)}
+.subject-card.calc .subject-progress-bar{background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.subject-meta{display:flex;justify-content:space-between;font-size:11px;color:var(--text3)}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;text-align:center}
+.stat-num{font-family:var(--font-mono);font-size:28px;font-weight:500;margin-bottom:4px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px}
+.stat-card.xp .stat-num{color:var(--accent4)}
+.stat-card.streak .stat-num{color:var(--accent2)}
+.stat-card.tests .stat-num{color:var(--accent3)}
+.stat-card.acc .stat-num{color:var(--accent)}
+
+/* TOPIC VIEW */
+.back-btn{background:none;border:1px solid var(--border);color:var(--text2);padding:7px 16px;border-radius:8px;cursor:pointer;font-family:var(--font-body);font-size:13px;margin-bottom:20px;transition:all 0.2s}
+.back-btn:hover{background:var(--bg3);color:var(--text)}
+.topic-header{margin-bottom:28px}
+.topic-header h2{font-family:var(--font-display);font-size:36px;margin-bottom:6px}
+.topic-header p{color:var(--text2);font-size:15px}
+.lessons-list{display:flex;flex-direction:column;gap:8px;margin-bottom:28px}
+.lesson-row{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px 18px;display:flex;align-items:center;gap:14px;cursor:pointer;transition:all 0.2s}
+.lesson-row:hover{border-color:var(--border2);background:var(--bg3)}
+.lesson-num{font-family:var(--font-mono);font-size:12px;color:var(--text3);min-width:28px}
+.lesson-info{flex:1}
+.lesson-title{font-size:14px;font-weight:500;margin-bottom:2px}
+.lesson-meta{font-size:12px;color:var(--text3)}
+.lesson-status{font-size:12px;padding:3px 10px;border-radius:20px;font-weight:500}
+.lesson-status.done{background:rgba(67,232,176,0.1);color:var(--accent3);border:1px solid rgba(67,232,176,0.2)}
+.lesson-status.locked{background:var(--bg3);color:var(--text3);border:1px solid var(--border)}
+.lesson-status.available{background:rgba(108,99,255,0.1);color:var(--accent);border:1px solid rgba(108,99,255,0.2)}
+.section-title{font-family:var(--font-display);font-size:20px;margin-bottom:12px;color:var(--text2)}
+
+/* TEST */
+.test-container{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);padding:28px;max-width:680px;margin:0 auto}
+.test-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.test-progress{font-size:13px;color:var(--text3);font-family:var(--font-mono)}
+.timer{font-family:var(--font-mono);font-size:13px;color:var(--accent4);background:var(--bg3);padding:4px 12px;border-radius:20px}
+.question-text{font-size:18px;font-weight:500;margin-bottom:8px;line-height:1.5}
+.question-sub{font-size:14px;color:var(--text2);margin-bottom:22px}
+.options{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.option-btn{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:13px 18px;text-align:left;cursor:pointer;color:var(--text);font-family:var(--font-body);font-size:14px;transition:all 0.2s;display:flex;align-items:center;gap:10px}
+.option-btn:hover{border-color:var(--accent);background:rgba(108,99,255,0.05)}
+.option-btn.selected{border-color:var(--accent);background:rgba(108,99,255,0.1);color:var(--accent)}
+.option-btn.correct{border-color:var(--accent3);background:rgba(67,232,176,0.1);color:var(--accent3)}
+.option-btn.wrong{border-color:var(--accent2);background:rgba(255,101,132,0.1);color:var(--accent2)}
+.opt-label{width:26px;height:26px;border-radius:50%;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;font-family:var(--font-mono);flex-shrink:0}
+.submit-btn{background:var(--accent);border:none;color:white;padding:12px 28px;border-radius:var(--btn-radius);cursor:pointer;font-family:var(--font-body);font-size:14px;font-weight:600;transition:all 0.2s;width:100%}
+.submit-btn:hover{background:#7c74ff}
+.submit-btn:disabled{background:var(--bg4);color:var(--text3);cursor:not-allowed}
+.feedback{padding:14px 18px;border-radius:10px;margin-bottom:16px;font-size:14px}
+.feedback.correct{background:rgba(67,232,176,0.1);border:1px solid rgba(67,232,176,0.2);color:var(--accent3)}
+.feedback.wrong{background:rgba(255,101,132,0.1);border:1px solid rgba(255,101,132,0.2);color:var(--accent2)}
+
+/* RESULTS */
+.results{text-align:center;padding:20px 0}
+.results-score{font-family:var(--font-display);font-size:72px;margin:12px 0}
+.results-grade{font-size:18px;color:var(--text2);margin-bottom:24px}
+.results-breakdown{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:24px}
+.result-item{background:var(--bg3);border-radius:10px;padding:14px;text-align:center}
+.result-val{font-family:var(--font-mono);font-size:22px;font-weight:500;margin-bottom:4px}
+.result-lbl{font-size:11px;color:var(--text3)}
+
+/* LOG */
+.log-list{display:flex;flex-direction:column;gap:8px}
+.log-entry{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:14px}
+.log-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.log-icon.test{background:rgba(108,99,255,0.15)}
+.log-icon.lesson{background:rgba(67,232,176,0.1)}
+.log-icon.xp{background:rgba(255,209,102,0.1)}
+.log-body{flex:1}
+.log-title{font-size:14px;font-weight:500;margin-bottom:2px}
+.log-time{font-size:12px;color:var(--text3)}
+.log-score{font-family:var(--font-mono);font-size:14px;font-weight:500}
+.log-score.good{color:var(--accent3)}
+.log-score.mid{color:var(--accent4)}
+.log-score.bad{color:var(--accent2)}
+.empty-log{text-align:center;padding:48px;color:var(--text3);font-size:15px}
+
+/* STUDY BUTTONS */
+.btn-row{display:flex;gap:10px;margin-bottom:20px}
+.btn{padding:9px 18px;border-radius:var(--btn-radius);cursor:pointer;font-family:var(--font-body);font-size:13px;font-weight:500;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all 0.2s}
+.btn:hover{background:var(--bg4);color:var(--text)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:white}
+.btn.primary:hover{background:#7c74ff}
+.btn.danger{background:rgba(255,101,132,0.1);border-color:rgba(255,101,132,0.3);color:var(--accent2)}
+
+/* AI tutor */
+.ai-box{background:var(--bg2);border:1px solid var(--border);border-radius:var(--card-radius);padding:20px;margin-top:20px}
+.ai-box-header{display:flex;align-items:center;gap:8px;margin-bottom:14px;font-size:13px;color:var(--text2);font-weight:600}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--accent3);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+.ai-response{font-size:14px;color:var(--text2);line-height:1.7;min-height:60px}
+.ai-input-row{display:flex;gap:8px;margin-top:12px}
+.ai-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 14px;color:var(--text);font-family:var(--font-body);font-size:13px}
+.ai-input::placeholder{color:var(--text3)}
+.ai-input:focus{outline:none;border-color:var(--accent)}
+.ai-send{background:var(--accent);border:none;color:white;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+
+/* LOADING */
+.loading{display:inline-flex;gap:4px;align-items:center}
+.loading span{width:6px;height:6px;border-radius:50%;background:var(--accent3);animation:bounce 1.2s infinite}
+.loading span:nth-child(2){animation-delay:0.2s}
+.loading span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg2)}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+<div id="app">
+<nav>
+  <div class="nav-logo">Math<span>Academy</span></div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('home')">Subjects</button>
+    <button class="nav-tab" onclick="showPage('log')">Activity Log</button>
+  </div>
+  <div class="nav-user">
+    <div class="xp-badge" id="xp-display">⚡ 0 XP</div>
+  </div>
+</nav>
+<main id="main-content"></main>
+</div>
+
+<script>
+const SUBJECTS = [
+  {id:'alg',cls:'alg',icon:'∑',title:'Algebra',desc:'Variables, equations, functions, and polynomials',color:'var(--accent)',
+    topics:[
+      {id:'alg1',title:'Order of Operations & Expressions',lessons:['What are variables?','Simplifying expressions','Order of operations (PEMDAS)','Combining like terms'],xp:50},
+      {id:'alg2',title:'Linear Equations',lessons:['Solving one-step equations','Two-step equations','Multi-step equations','Equations with variables on both sides'],xp:60},
+      {id:'alg3',title:'Inequalities',lessons:['Writing inequalities','Solving linear inequalities','Compound inequalities','Graphing inequalities'],xp:60},
+      {id:'alg4',title:'Systems of Equations',lessons:['Substitution method','Elimination method','Graphical solutions','Word problems'],xp:70},
+      {id:'alg5',title:'Polynomials & Factoring',lessons:['Adding & subtracting polynomials','Multiplying polynomials','Factoring GCF','Factoring trinomials','Difference of squares'],xp:80},
+      {id:'alg6',title:'Quadratic Equations',lessons:['Standard form & parabolas','Solving by factoring','Quadratic formula','Completing the square','Discriminant'],xp:90},
+    ],
+    tests:[
+      {id:'talg1',title:'Algebra Foundations Quiz',questions:genQuestions('algebra','basic'),xp:100},
+      {id:'talg2',title:'Equations & Inequalities Test',questions:genQuestions('algebra','equations'),xp:150},
+      {id:'talg3',title:'Algebra Final Exam',questions:genQuestions('algebra','advanced'),xp:250},
+    ]
+  },
+  {id:'geo',cls:'geo',icon:'△',title:'Geometry',desc:'Shapes, proofs, area, volume, and coordinate geometry',color:'var(--accent2)',
+    topics:[
+      {id:'geo1',title:'Foundations & Proofs',lessons:['Points, lines, planes','Angles and angle pairs','Parallel lines & transversals','Triangle congruence'],xp:60},
+      {id:'geo2',title:'Triangles',lessons:['Triangle angle sum','Pythagorean theorem','Special right triangles','Triangle similarity'],xp:70},
+      {id:'geo3',title:'Polygons & Circles',lessons:['Area of polygons','Circle theorems','Arc length & sectors','Volume of 3D shapes'],xp:80},
+      {id:'geo4',title:'Coordinate Geometry',lessons:['Distance formula','Midpoint formula','Slope & equations of lines','Transformations'],xp:70},
+    ],
+    tests:[
+      {id:'tgeo1',title:'Geometry Basics Quiz',questions:genQuestions('geometry','basic'),xp:100},
+      {id:'tgeo2',title:'Triangles & Circles Test',questions:genQuestions('geometry','shapes'),xp:150},
+    ]
+  },
+  {id:'trig',cls:'trig',icon:'∿',title:'Trigonometry',desc:'Sine, cosine, tangent, and the unit circle',color:'var(--accent3)',
+    topics:[
+      {id:'trig1',title:'Right Triangle Trig',lessons:['SOHCAHTOA','Finding missing sides','Finding missing angles','Inverse trig functions'],xp:70},
+      {id:'trig2',title:'The Unit Circle',lessons:['Radian measure','Unit circle values','Reference angles','Co-function identities'],xp:80},
+      {id:'trig3',title:'Trig Graphs & Identities',lessons:['Graphing sine & cosine','Amplitude, period, phase shift','Pythagorean identities','Sum/difference formulas'],xp:90},
+    ],
+    tests:[
+      {id:'ttrig1',title:'Trig Fundamentals Quiz',questions:genQuestions('trigonometry','basic'),xp:120},
+      {id:'ttrig2',title:'Trig Mastery Test',questions:genQuestions('trigonometry','advanced'),xp:200},
+    ]
+  },
+  {id:'precalc',cls:'precalc',icon:'ƒ',title:'Pre-Calculus',desc:'Functions, sequences, and advanced algebra',color:'var(--accent4)',
+    topics:[
+      {id:'pc1',title:'Functions',lessons:['Function notation & domain/range','Composition of functions','Inverse functions','Piecewise functions'],xp:80},
+      {id:'pc2',title:'Exponential & Logarithms',lessons:['Exponential functions','Logarithm rules','Natural log & e','Exponential equations'],xp:90},
+      {id:'pc3',title:'Sequences & Series',lessons:['Arithmetic sequences','Geometric sequences','Sigma notation','Infinite geometric series'],xp:80},
+      {id:'pc4',title:'Conic Sections',lessons:['Circles','Parabolas (advanced)','Ellipses','Hyperbolas'],xp:100},
+    ],
+    tests:[
+      {id:'tpc1',title:'Functions & Logs Quiz',questions:genQuestions('precalculus','basic'),xp:130},
+      {id:'tpc2',title:'Pre-Calculus Final',questions:genQuestions('precalculus','advanced'),xp:220},
+    ]
+  },
+  {id:'calc',cls:'calc',icon:'∫',title:'Calculus',desc:'Limits, derivatives, integrals, and applications',color:'var(--accent)',
+    topics:[
+      {id:'c1',title:'Limits & Continuity',lessons:['Intuitive limits','Limit laws','One-sided limits','Continuity & discontinuity','Limits at infinity'],xp:100},
+      {id:'c2',title:'Derivatives',lessons:['Definition of derivative','Power rule','Product & quotient rules','Chain rule','Implicit differentiation'],xp:110},
+      {id:'c3',title:'Applications of Derivatives',lessons:['Increasing/decreasing','Critical points & extrema','Curve sketching','Optimization','Related rates'],xp:120},
+      {id:'c4',title:'Integrals',lessons:['Antiderivatives','Definite vs indefinite','Fundamental Theorem of Calculus','U-substitution','Area between curves'],xp:130},
+    ],
+    tests:[
+      {id:'tc1',title:'Limits & Derivatives Quiz',questions:genQuestions('calculus','basic'),xp:150},
+      {id:'tc2',title:'Applications Test',questions:genQuestions('calculus','applications'),xp:200},
+      {id:'tc3',title:'Calculus Final Exam',questions:genQuestions('calculus','advanced'),xp:300},
+    ]
+  }
+];
+
+function genQuestions(subject,level){
+  const bank = {
+    algebra:{
+      basic:[
+        {q:'Simplify: 3x + 2x − x',opts:['4x','5x','3x','6x'],ans:0,exp:'Combine like terms: 3x + 2x − x = (3+2−1)x = 4x'},
+        {q:'Solve for x: 2x + 6 = 14',opts:['x = 3','x = 4','x = 5','x = 10'],ans:1,exp:'Subtract 6: 2x = 8, then divide by 2: x = 4'},
+        {q:'What is the value of 3² + 4²?',opts:['14','25','49','7'],ans:1,exp:'3² = 9, 4² = 16, sum = 25'},
+        {q:'Which property justifies a(b + c) = ab + ac?',opts:['Commutative','Associative','Distributive','Identity'],ans:2,exp:'The distributive property: a(b+c) = ab + ac'},
+        {q:'Solve: −3x > 12',opts:['x > −4','x < −4','x > 4','x < 4'],ans:1,exp:'Divide by −3 and flip inequality: x < −4'},
+      ],
+      equations:[
+        {q:'Solve the system: x + y = 10, x − y = 4',opts:['x=7,y=3','x=3,y=7','x=6,y=4','x=8,y=2'],ans:0,exp:'Add equations: 2x=14, x=7. Then y=10−7=3'},
+        {q:'Factor: x² − 9',opts:['(x−3)²','(x+3)(x−3)','(x−3)(x+3)','x(x−9)'],ans:1,exp:'Difference of squares: a²−b² = (a+b)(a−b)'},
+        {q:'What is the discriminant of x² + 2x + 5?',opts:['−16','16','24','−24'],ans:0,exp:'b²−4ac = 4−4(1)(5) = 4−20 = −16'},
+        {q:'Solve: x² − 5x + 6 = 0',opts:['x=2,3','x=−2,−3','x=1,6','x=−1,6'],ans:0,exp:'Factor: (x−2)(x−3)=0, so x=2 or x=3'},
+        {q:'Simplify: (2x³)(3x²)',opts:['5x⁵','6x⁵','6x⁶','5x⁶'],ans:1,exp:'Multiply coefficients: 2×3=6. Add exponents: x^(3+2)=x⁵. Answer: 6x⁵'},
+      ],
+      advanced:[
+        {q:'Find the vertex of y = x² − 4x + 7',opts:['(2, 3)','(−2, 3)','(2, −3)','(4, 7)'],ans:0,exp:'Vertex x = −b/2a = 4/2 = 2. y = 4−8+7 = 3'},
+        {q:'For f(x) = 2x−1 and g(x) = x+3, find f(g(2)).',opts:['9','7','5','3'],ans:0,exp:'g(2)=5, then f(5)=2(5)−1=9'},
+        {q:'Solve: |2x − 4| = 8',opts:['x=6,−2','x=2,6','x=−6,2','x=6,2'],ans:0,exp:'2x−4=8 → x=6 OR 2x−4=−8 → x=−2'},
+        {q:'Simplify: (x² − 4)/(x − 2)',opts:['x+2','x−2','x²−2','x+4'],ans:0,exp:'Factor numerator: (x+2)(x−2)/(x−2) = x+2 for x≠2'},
+        {q:'What is the sum of the roots of 2x² − 8x + 6 = 0?',opts:['4','3','−4','8'],ans:0,exp:'By Vieta\'s: sum = −b/a = −(−8)/2 = 4'},
+      ]
+    },
+    geometry:{
+      basic:[
+        {q:'Two angles are supplementary. One measures 65°. Find the other.',opts:['115°','25°','125°','35°'],ans:0,exp:'Supplementary angles sum to 180°: 180−65=115°'},
+        {q:'A right triangle has legs 6 and 8. Find the hypotenuse.',opts:['10','14','12','√100'],ans:0,exp:'c² = 6² + 8² = 36+64 = 100, c = 10'},
+        {q:'The sum of interior angles of a hexagon is:',opts:['540°','720°','600°','360°'],ans:1,exp:'Formula: (n−2)×180 = (6−2)×180 = 720°'},
+        {q:'Circumference of a circle with radius 5 is:',opts:['10π','25π','5π','20π'],ans:0,exp:'C = 2πr = 2π(5) = 10π'},
+        {q:'Area of a triangle with base 10 and height 6:',opts:['30','60','15','36'],ans:0,exp:'A = ½bh = ½(10)(6) = 30'},
+      ],
+      shapes:[
+        {q:'A 30-60-90 triangle has hypotenuse 10. Find the shorter leg.',opts:['5','5√3','10√3','5√2'],ans:0,exp:'In 30-60-90: shorter leg = hyp/2 = 10/2 = 5'},
+        {q:'Area of circle with diameter 12:',opts:['36π','144π','12π','6π'],ans:0,exp:'r = 6, A = πr² = 36π'},
+        {q:'Two triangles are similar with ratio 3:5. If small perimeter is 24, large perimeter is:',opts:['40','45','30','48'],ans:0,exp:'Scale factor 3:5, so 24×(5/3) = 40'},
+        {q:'Volume of sphere with radius 3:',opts:['36π','12π','4π','9π'],ans:0,exp:'V = (4/3)πr³ = (4/3)π(27) = 36π'},
+        {q:'An inscribed angle that intercepts a semicircle measures:',opts:['90°','45°','180°','60°'],ans:0,exp:'An inscribed angle is half the central angle; a semicircle is 180°, so inscribed angle = 90°'},
+      ]
+    },
+    trigonometry:{
+      basic:[
+        {q:'sin(30°) = ?',opts:['1/2','√3/2','√2/2','1'],ans:0,exp:'sin(30°) = 1/2 (memorize unit circle)'},
+        {q:'In a right triangle, SOHCAHTOA means sin = ?',opts:['Opp/Hyp','Adj/Hyp','Opp/Adj','Hyp/Opp'],ans:0,exp:'SOH: Sin = Opposite/Hypotenuse'},
+        {q:'cos(60°) = ?',opts:['1/2','√3/2','√2/2','0'],ans:0,exp:'cos(60°) = 1/2'},
+        {q:'tan(45°) = ?',opts:['1','0','√3','1/√3'],ans:0,exp:'tan(45°) = sin/cos = (√2/2)/(√2/2) = 1'},
+        {q:'How many radians is 180°?',opts:['π','2π','π/2','π/4'],ans:0,exp:'180° = π radians (this is the conversion factor)'},
+      ],
+      advanced:[
+        {q:'sin²θ + cos²θ = ?',opts:['1','0','sin(2θ)','2'],ans:0,exp:'This is the fundamental Pythagorean identity'},
+        {q:'What is the period of y = sin(2x)?',opts:['π','2π','π/2','4π'],ans:0,exp:'Period = 2π/|b| = 2π/2 = π'},
+        {q:'cos(2θ) equals which of the following?',opts:['cos²θ − sin²θ','2sinθcosθ','1−sin²θ','sinθcosθ'],ans:0,exp:'Double angle formula: cos(2θ) = cos²θ − sin²θ'},
+        {q:'sin(π/6) in radians = ?',opts:['1/2','√3/2','√2/2','1'],ans:0,exp:'π/6 = 30°, sin(30°) = 1/2'},
+        {q:'The amplitude of y = 3sin(x) is:',opts:['3','1','6','π'],ans:0,exp:'Amplitude = |A| where y = A·sin(x). Here A = 3'},
+      ]
+    },
+    precalculus:{
+      basic:[
+        {q:'If f(x) = 3x + 2, find f(4).',opts:['14','12','18','10'],ans:0,exp:'f(4) = 3(4) + 2 = 12 + 2 = 14'},
+        {q:'log₂(8) = ?',opts:['3','2','4','1'],ans:0,exp:'2³ = 8, so log₂(8) = 3'},
+        {q:'What is the domain of f(x) = √(x − 3)?',opts:['x ≥ 3','x > 3','x ≤ 3','all reals'],ans:0,exp:'Square root requires x−3 ≥ 0, so x ≥ 3'},
+        {q:'In arithmetic sequence 2, 5, 8... the 10th term is:',opts:['29','32','26','35'],ans:0,exp:'aₙ = a₁ + (n−1)d = 2 + 9(3) = 29'},
+        {q:'If f(x) = x² and g(x) = x+1, f(g(x)) = ?',opts:['(x+1)²','x²+1','x²+x','2x+1'],ans:0,exp:'f(g(x)) = f(x+1) = (x+1)²'},
+      ],
+      advanced:[
+        {q:'Solve: log(x) + log(x−3) = 1 (base 10)',opts:['x=5','x=2','x=−2','x=10'],ans:0,exp:'log[x(x−3)]=1 → x(x−3)=10 → x²−3x−10=0 → (x−5)(x+2)=0 → x=5 (x>0)'},
+        {q:'Sum of infinite geometric series with a=4, r=0.5:',opts:['8','6','16','4'],ans:0,exp:'S = a/(1−r) = 4/(1−0.5) = 4/0.5 = 8'},
+        {q:'What is the inverse of f(x) = 2x − 6?',opts:['(x+6)/2','(x−6)/2','2x+6','x/2+6'],ans:0,exp:'Swap x and y: x=2y−6, solve: y=(x+6)/2'},
+        {q:'Equation of ellipse with a=5, b=3, centered at origin (horizontal):',opts:['x²/25 + y²/9 = 1','x²/9 + y²/25 = 1','x²/5 + y²/3 = 1','25x² + 9y² = 1'],ans:0,exp:'Standard form: x²/a² + y²/b² = 1 = x²/25 + y²/9 = 1'},
+        {q:'eˡⁿ⁵ = ?',opts:['5','ln5','e⁵','1'],ans:0,exp:'e and ln are inverse functions: e^(ln x) = x, so e^(ln 5) = 5'},
+      ]
+    },
+    calculus:{
+      basic:[
+        {q:'lim(x→2) of (x² − 4)/(x − 2) = ?',opts:['4','0','2','undefined'],ans:0,exp:'Factor: (x+2)(x−2)/(x−2) = x+2, limit = 2+2 = 4'},
+        {q:'d/dx of x³ = ?',opts:['3x²','x²','3x³','3'],ans:0,exp:'Power rule: d/dx(xⁿ) = nxⁿ⁻¹. Here n=3: 3x²'},
+        {q:'d/dx of sin(x) = ?',opts:['cos(x)','−cos(x)','−sin(x)','tan(x)'],ans:0,exp:'Derivative of sin(x) is cos(x) — fundamental trig derivative'},
+        {q:'∫x² dx = ?',opts:['x³/3 + C','2x + C','x³ + C','x²/2 + C'],ans:0,exp:'Power rule for integration: ∫xⁿ dx = xⁿ⁺¹/(n+1) + C'},
+        {q:'If f(x) = 5, then f\'(x) = ?',opts:['0','5','1','undefined'],ans:0,exp:'Derivative of a constant is always 0'},
+      ],
+      applications:[
+        {q:'At x=2, f(x) = x³ − 3x has a local:',opts:['Minimum','Maximum','Neither','Inflection point'],ans:1,exp:'f\'(x)=3x²−3=0 → x=±1. f\'\'(x)=6x. f\'\'(−1)=−6<0 → max at x=−1. So at x=2 not a critical point.'},
+        {q:'d/dx of eˣ = ?',opts:['eˣ','xeˣ⁻¹','e','eˣ⁻¹'],ans:0,exp:'eˣ is its own derivative — unique and fundamental!'},
+        {q:'The derivative of ln(x) is:',opts:['1/x','ln(x)','x','1/ln(x)'],ans:0,exp:'d/dx[ln(x)] = 1/x for x > 0'},
+        {q:'∫₀² x dx = ?',opts:['2','4','1','0'],ans:0,exp:'∫x dx = x²/2. Evaluate: [4/2 − 0/2] = 2'},
+        {q:'Using chain rule, d/dx of sin(3x) = ?',opts:['3cos(3x)','cos(3x)','−3cos(3x)','sin(3)'],ans:0,exp:'Chain rule: derivative of outer × derivative of inner = cos(3x) × 3 = 3cos(3x)'},
+      ],
+      advanced:[
+        {q:'The Fundamental Theorem of Calculus links:',opts:['Derivatives & integrals','Limits & continuity','Algebra & geometry','Sequences & series'],ans:0,exp:'FTC establishes that differentiation and integration are inverse operations'},
+        {q:'lim(x→∞) of 1/x = ?',opts:['0','1','∞','undefined'],ans:0,exp:'As x grows without bound, 1/x approaches 0'},
+        {q:'d/dx of x·sin(x) = ?',opts:['sin(x)+x·cos(x)','cos(x)','x·cos(x)','sin(x)·cos(x)'],ans:0,exp:'Product rule: d/dx[u·v] = u\'v + uv\' = sin(x) + x·cos(x)'},
+        {q:'∫eˣ dx = ?',opts:['eˣ + C','xeˣ + C','eˣ⁻¹ + C','eˣ/x + C'],ans:0,exp:'eˣ is its own antiderivative: ∫eˣ dx = eˣ + C'},
+        {q:'An optimization problem finds a max/min by setting:',opts:["f'(x) = 0","f(x) = 0","f''(x) = 0","f'(x) = 1"],ans:0,exp:'Critical points occur where f\'(x) = 0 (or undefined). Then test using 2nd derivative.'},
+      ]
+    }
+  };
+  const sub = bank[subject]||bank.algebra;
+  return (sub[level]||sub.basic).map(q=>({...q}));
+}
+
+// STATE
+let state = {
+  page:'home',subject:null,topic:null,test:null,testState:null,
+  xp:0,streak:0,testsCompleted:0,accuracy:0,log:[],progress:{},lastActive:null
+};
+
+function loadState(){
+  try{const s=localStorage.getItem('mathacademy_state');if(s)state={...state,...JSON.parse(s)};}catch(e){}
+}
+function saveState(){
+  try{localStorage.setItem('mathacademy_state',JSON.stringify(state));}catch(e){}
+}
+function addLog(type,title,score,xp){
+  const now=new Date();
+  state.log.unshift({type,title,score,xp,time:now.toISOString()});
+  if(state.log.length>50)state.log=state.log.slice(0,50);
+  state.xp=(state.xp||0)+xp;
+  saveState();
+  document.getElementById('xp-display').textContent='⚡ '+state.xp+' XP';
+}
+function fmtTime(iso){
+  if(!iso)return '';
+  const d=new Date(iso),now=new Date(),diff=now-d;
+  if(diff<60000)return 'just now';
+  if(diff<3600000)return Math.floor(diff/60000)+'m ago';
+  if(diff<86400000)return Math.floor(diff/3600000)+'h ago';
+  return d.toLocaleDateString();
+}
+function showPage(p){
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>{t.classList.toggle('active',['home','log'][i]===p);});
+  state.page=p;render();
+}
+function getProgress(id){return state.progress[id]||{done:false,lessons:{}};}
+function markLesson(subId,topId,lesIdx){
+  if(!state.progress[topId])state.progress[topId]={done:false,lessons:{}};
+  state.progress[topId].lessons[lesIdx]=true;
+  addLog('lesson','Completed lesson',null,10);
+  saveState();render();
+}
+function getSubjectProgress(sub){
+  let total=0,done=0;
+  sub.topics.forEach(t=>{total+=t.lessons.length;const p=getProgress(t.id);done+=Object.keys(p.lessons||{}).length;});
+  return total>0?Math.round(done/total*100):0;
+}
+function render(){
+  const el=document.getElementById('main-content');
+  if(state.page==='log'){el.innerHTML=renderLog();return;}
+  if(!state.subject){el.innerHTML=renderHome();return;}
+  if(state.test&&state.testState){el.innerHTML=renderTest();return;}
+  el.innerHTML=renderSubject();
+  document.getElementById('xp-display').textContent='⚡ '+state.xp+' XP';
+}
+function renderHome(){
+  const testsDone=state.log.filter(l=>l.type==='test').length;
+  const accScores=state.log.filter(l=>l.type==='test'&&l.score!=null).map(l=>l.score);
+  const avgAcc=accScores.length?Math.round(accScores.reduce((a,b)=>a+b,0)/accScores.length):0;
+  return `<div class="hero"><h1>Master <em>High School</em> Math</h1><p>From Algebra to Calculus — study, test, and track your progress</p></div>
+  <div class="stats-row">
+    <div class="stat-card xp"><div class="stat-num">${state.xp}</div><div class="stat-label">Total XP</div></div>
+    <div class="stat-card tests"><div class="stat-num">${testsDone}</div><div class="stat-label">Tests Done</div></div>
+    <div class="stat-card acc"><div class="stat-num">${avgAcc}%</div><div class="stat-label">Avg Score</div></div>
+    <div class="stat-card streak"><div class="stat-num">${state.log.length}</div><div class="stat-label">Activities</div></div>
+  </div>
+  <div class="subject-grid">${SUBJECTS.map(s=>{const pct=getSubjectProgress(s);return `<div class="subject-card ${s.cls}" onclick="openSubject('${s.id}')"><div class="subject-icon">${s.icon}</div><div class="subject-title">${s.title}</div><div class="subject-desc">${s.desc}</div><div class="subject-progress"><div class="subject-progress-bar" style="width:${pct}%"></div></div><div class="subject-meta"><span>${pct}% complete</span><span>${s.topics.length} topics</span></div></div>`;}).join('')}</div>`;
+}
+function renderSubject(){
+  const sub=SUBJECTS.find(s=>s.id===state.subject);
+  if(!sub)return renderHome();
+  return `<button class="back-btn" onclick="closeSubject()">← Back to Subjects</button>
+  <div class="topic-header"><h2>${sub.icon} ${sub.title}</h2><p>${sub.desc}</p></div>
+  <div class="section-title">Topics & Lessons</div>
+  <div class="lessons-list">${sub.topics.map((t,ti)=>{const p=getProgress(t.id);const doneLessons=Object.keys(p.lessons||{}).length;return `<div class="lesson-row" onclick="toggleTopic('${t.id}')"><div class="lesson-num">${String(ti+1).padStart(2,'0')}</div><div class="lesson-info"><div class="lesson-title">${t.title}</div><div class="lesson-meta">${t.lessons.length} lessons · ${t.xp} XP</div></div><span class="lesson-status available">${doneLessons}/${t.lessons.length}</span></div><div id="topic-${t.id}" style="display:none;background:var(--bg3);border:1px solid var(--border);border-top:none;border-radius:0 0 12px 12px;padding:8px 12px;margin-bottom:0;margin-top:-8px">${t.lessons.map((l,li)=>{const done=!!(p.lessons||{})[li];return `<div style="display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px;cursor:pointer;transition:background 0.2s" onmouseenter="this.style.background='var(--bg4)'" onmouseleave="this.style.background='transparent'" onclick="event.stopPropagation();markLesson('${sub.id}','${t.id}',${li})"><span style="color:${done?'var(--accent3)':'var(--text3)'};font-size:14px">${done?'✓':'○'}</span><span style="font-size:13px;color:${done?'var(--text2)':'var(--text)'}">${l}</span>${done?'':'<span style="font-size:11px;color:var(--accent);margin-left:auto;background:rgba(108,99,255,0.1);padding:2px 8px;border-radius:20px">+10 XP</span>'}</div>`;}).join('')}</div>`;}).join('')}</div>
+  <div class="section-title" style="margin-top:8px">Practice Tests</div>
+  <div class="lessons-list">${sub.tests.map((t,ti)=>{const done=state.log.find(l=>l.type==='test'&&l.title===t.title);return `<div class="lesson-row" onclick="startTest('${sub.id}','${t.id}')"><div class="lesson-num">T${ti+1}</div><div class="lesson-info"><div class="lesson-title">${t.title}</div><div class="lesson-meta">${t.questions.length} questions · ${t.xp} XP reward</div></div><span class="lesson-status ${done?'done':'available'}">${done?'Score: '+done.score+'%':'Start'}</span></div>`;}).join('')}</div>
+  <div class="ai-box"><div class="ai-box-header"><div class="ai-dot"></div> AI Tutor — Ask anything about ${sub.title}</div><div class="ai-response" id="ai-resp">Ask me anything about ${sub.title}! I can explain concepts, work through problems, or help you understand tricky topics.</div><div class="ai-input-row"><input class="ai-input" id="ai-q" placeholder="e.g. Can you explain the quadratic formula?" onkeydown="if(event.key==='Enter')askAI()"><button class="ai-send" onclick="askAI()">Ask ↗</button></div></div>`;
+}
+function toggleTopic(id){const el=document.getElementById('topic-'+id);if(el)el.style.display=el.style.display==='none'?'block':'none';}
+function startTest(subId,testId){
+  const sub=SUBJECTS.find(s=>s.id===subId);
+  const test=sub.tests.find(t=>t.id===testId);
+  state.test=test;
+  state.testState={current:0,answers:[],selected:null,revealed:false,startTime:Date.now(),score:null};
+  render();
+}
+function renderTest(){
+  const t=state.test,ts=state.testState;
+  if(ts.score!==null)return renderResults();
+  const q=t.questions[ts.current];
+  const labels=['A','B','C','D'];
+  const pct=Math.round((ts.current/t.questions.length)*100);
+  const elapsed=Math.floor((Date.now()-ts.startTime)/1000);
+  const mins=Math.floor(elapsed/60).toString().padStart(2,'0');
+  const secs=(elapsed%60).toString().padStart(2,'0');
+  return `<button class="back-btn" onclick="closeTest()">← Exit Test</button>
+  <div class="test-container">
+    <div class="test-header"><div><div style="font-size:15px;font-weight:600;margin-bottom:2px">${t.title}</div><div class="test-progress">Question ${ts.current+1} of ${t.questions.length}</div></div><div class="timer" id="timer">${mins}:${secs}</div></div>
+    <div style="height:4px;background:var(--bg3);border-radius:4px;margin-bottom:24px;overflow:hidden"><div style="height:100%;background:var(--accent);border-radius:4px;width:${pct}%;transition:width 0.3s"></div></div>
+    <div class="question-text">${q.q}</div>
+    <div class="options">${q.opts.map((o,i)=>{let cls='option-btn';if(ts.revealed){if(i===q.ans)cls+=' correct';else if(i===ts.selected&&i!==q.ans)cls+=' wrong';}else if(i===ts.selected)cls+=' selected';return `<button class="${cls}" onclick="selectAnswer(${i})" ${ts.revealed?'disabled':''}><span class="opt-label">${labels[i]}</span>${o}</button>`;}).join('')}</div>
+    ${ts.revealed?`<div class="feedback ${ts.selected===q.ans?'correct':'wrong'}">${ts.selected===q.ans?'✓ Correct!':'✗ Incorrect.'} ${q.exp}</div><button class="submit-btn" onclick="nextQuestion()">${ts.current+1<t.questions.length?'Next Question →':'View Results'}</button>`:`<button class="submit-btn" onclick="submitAnswer()" ${ts.selected===null?'disabled':''}>Submit Answer</button>`}
+  </div>`;
+}
+function selectAnswer(i){if(state.testState.revealed)return;state.testState.selected=i;render();}
+function submitAnswer(){const ts=state.testState;if(ts.selected===null)return;ts.revealed=true;ts.answers.push({q:ts.current,selected:ts.selected,correct:ts.selected===state.test.questions[ts.current].ans});render();}
+function nextQuestion(){
+  const ts=state.testState,t=state.test;
+  if(ts.current+1>=t.questions.length){
+    const correct=ts.answers.filter(a=>a.correct).length;
+    const pct=Math.round(correct/t.questions.length*100);
+    const elapsed=Math.floor((Date.now()-ts.startTime)/1000);
+    ts.score=pct;ts.elapsed=elapsed;
+    const earnedXp=Math.round(t.xp*(pct/100));
+    addLog('test',t.title,pct,earnedXp);
+    state.testsCompleted=(state.testsCompleted||0)+1;
+    saveState();
+  }else{ts.current++;ts.selected=null;ts.revealed=false;}
+  render();
+}
+function renderResults(){
+  const ts=state.testState,t=state.test;
+  const correct=ts.answers.filter(a=>a.correct).length;
+  const pct=ts.score;
+  const grade=pct>=90?'A':pct>=80?'B':pct>=70?'C':pct>=60?'D':'F';
+  const gradeColor=pct>=80?'var(--accent3)':pct>=70?'var(--accent4)':'var(--accent2)';
+  const mins=Math.floor(ts.elapsed/60),secs=ts.elapsed%60;
+  return `<button class="back-btn" onclick="closeTest()">← Back to Subject</button>
+  <div class="test-container"><div class="results">
+    <div style="font-size:13px;color:var(--text3);margin-bottom:8px">Test Complete</div>
+    <div class="results-score" style="color:${gradeColor}">${grade}</div>
+    <div class="results-grade">${pct}% · ${correct}/${t.questions.length} correct</div>
+    <div class="results-breakdown">
+      <div class="result-item"><div class="result-val" style="color:${gradeColor}">${pct}%</div><div class="result-lbl">Score</div></div>
+      <div class="result-item"><div class="result-val" style="color:var(--accent4)">${mins}m ${secs}s</div><div class="result-lbl">Time</div></div>
+      <div class="result-item"><div class="result-val" style="color:var(--accent)">${Math.round(t.xp*(pct/100))}</div><div class="result-lbl">XP Earned</div></div>
+    </div>
+    <div style="text-align:left;margin-bottom:16px"><div style="font-size:13px;color:var(--text3);margin-bottom:10px;font-weight:600">QUESTION BREAKDOWN</div>
+    ${ts.answers.map((a,i)=>{const q=t.questions[i];return `<div style="display:flex;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px"><span style="color:${a.correct?'var(--accent3)':'var(--accent2)'};font-weight:600;min-width:16px">${a.correct?'✓':'✗'}</span><span style="flex:1;color:var(--text2)">${q.q}</span></div>`;}).join('')}</div>
+    <button class="submit-btn" onclick="closeTest()">Back to Subject</button>
+  </div></div>`;
+}
+function renderLog(){
+  if(!state.log.length)return `<div class="empty-log">📋 No activity yet. Start studying to see your log!</div>`;
+  return `<div style="margin-bottom:20px;display:flex;justify-content:space-between;align-items:center"><div style="font-family:var(--font-display);font-size:28px">Activity Log</div><button class="btn danger" onclick="clearLog()">Clear Log</button></div>
+  <div class="log-list">${state.log.map(l=>{const scoreClass=l.score==null?'':(l.score>=80?'good':l.score>=60?'mid':'bad');return `<div class="log-entry"><div class="log-icon ${l.type}">${l.type==='test'?'📝':l.type==='lesson'?'📖':'⚡'}</div><div class="log-body"><div class="log-title">${l.title}</div><div class="log-time">${fmtTime(l.time)} · +${l.xp} XP</div></div>${l.score!=null?`<div class="log-score ${scoreClass}">${l.score}%</div>`:''}</div>`;}).join('')}</div>`;
+}
+function clearLog(){if(confirm('Clear your activity log? XP will be kept.')){state.log=[];saveState();render();}}
+function openSubject(id){state.subject=id;render();}
+function closeSubject(){state.subject=null;state.test=null;state.testState=null;render();}
+function closeTest(){state.test=null;state.testState=null;render();}
+
+async function askAI(){
+  const input=document.getElementById('ai-q');
+  const resp=document.getElementById('ai-resp');
+  if(!input||!resp)return;
+  const q=input.value.trim();
+  if(!q)return;
+  const sub=SUBJECTS.find(s=>s.id===state.subject);
+  input.value='';
+  resp.innerHTML='<div class="loading"><span></span><span></span><span></span></div>';
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:`You are a helpful, encouraging high school math tutor specializing in ${sub?sub.title:'math'}. Give clear, concise explanations. Use simple notation. Be warm and supportive. Keep responses under 150 words.`,messages:[{role:'user',content:q}]})});
+    const d=await r.json();
+    const text=d.content?.[0]?.text||'Sorry, I had trouble answering that. Try asking again!';
+    resp.innerHTML=text.replace(/\n/g,'<br>');
+  }catch(e){resp.innerHTML='The AI tutor is currently unavailable. Try again shortly!';}
+}
+
+loadState();
+render();
+document.getElementById('xp-display').textContent='⚡ '+state.xp+' XP';
+</script>
+</body>
+</html>
+HTMLEOF
+echo "Done"
+Output
+
